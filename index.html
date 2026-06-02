@@ -1,0 +1,642 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="도봉사회복지성장">
+    
+    <link rel="shortcut icon" type="image/jpeg" href="icon-512.jpg?v=11">
+    <link rel="icon" type="image/jpeg" sizes="16x16" href="icon-512.jpg?v=11">
+    <link rel="icon" type="image/jpeg" sizes="32x32" href="icon-512.jpg?v=11">
+    <link rel="icon" type="image/jpeg" sizes="192x192" href="icon-512.jpg?v=11">
+    <link rel="apple-touch-icon" sizes="512x512" href="icon-512.jpg?v=11">
+    <link rel="manifest" href="manifest.json?v=11">
+    
+    <title>도봉 사회복지사 성장 지원</title>
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght=700;900&display=swap" rel="stylesheet">
+    
+    <style>
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        body { margin: 0; font-family: 'Noto Sans KR', sans-serif; background-color: #fff; overflow: hidden; }
+
+        .app-shell { width: 100vw; height: 100vh; height: 100dvh; display: flex; flex-direction: column; }
+        
+        /* 💡 배경을 다시 남색으로, 글씨는 흰색 고정으로 세련되게 변경 */
+        .header { 
+            background: #1a237e; color: #ffffff; padding: 35px 45px 15px 45px; 
+            text-align: center; font-size: 17px; font-weight: 900; position: relative; flex-shrink: 0;
+            display: flex; align-items: center; justify-content: center; gap: 8px;
+        }
+        /* 💡 투명 마크가 남색 배경에 묻히지 않으면서 너무 튀지 않도록 부드러운 연회색 베이스 배지 적용 */
+        .header .logo-img { 
+            height: 24px; 
+            width: auto; 
+            vertical-align: middle; 
+            background-color: #f1f3f5; 
+            padding: 2px 6px; 
+            border-radius: 5px;
+            display: inline-block;
+        }
+        .header .gear-icon { position: absolute; right: 15px; bottom: 15px; font-size: 18px; cursor: pointer; color: #ffffff; }
+
+        .content { 
+            flex: 1; padding: 20px; overflow-y: auto; 
+            background-image: linear-gradient(rgba(235, 180, 190, 0.25) 2px, transparent 2px), 
+                              linear-gradient(90deg, rgba(235, 180, 190, 0.25) 2px, transparent 2px);
+            background-size: 40px 40px;
+        }
+
+        .p-card { 
+            background: #fff; border: 5px solid #000; border-radius: 25px; 
+            padding: 20px; margin-bottom: 20px; overflow: hidden; word-break: keep-all; overflow-wrap: break-word;
+        }
+
+        /* 교육 탭 전용: 슬림한 2px 검정 테두리로 모바일 선택 가시성 극대화 */
+        #page-participation .p-card {
+            border: 2px solid #000000;
+            border-radius: 18px;
+            padding: 15px;
+        }
+        #page-participation .p-card > span:first-of-type {
+            font-size: 20px !important;
+        }
+
+        .overall-progress-box { margin-bottom: 25px; padding: 15px; background: #fff; border: 4px solid #000; border-radius: 20px; text-align: center; }
+        .overall-label { font-size: 18px; font-weight: 900; display: block; margin-bottom: 8px; }
+        .overall-bar { height: 15px; background: #eee; border: 2px solid #000; border-radius: 10px; overflow: hidden; }
+        .overall-fill { height: 100%; background: #ad1457; width: 0%; transition: width 0.3s; }
+        .status-text { font-size: 14px; font-weight: 700; color: #555; margin-top: 5px; display: block; }
+
+        .roadmap-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 25px; }
+        .tile { border: 4px solid #000; border-radius: 20px; padding: 15px; height: 105px; display: flex; flex-direction: column; justify-content: center; align-items: center; cursor: pointer; text-align: center; }
+        .tile.yellow { background: #fbc02d; }
+        .tile.beige { background: #fff3dd; }
+        .tile.pink { background: #f8bbd0; }
+        .tile.purple { background: #ad1457; color: #fff; }
+        .tile-name { font-size: 24px; font-weight: 900; }
+        .tile-hour { font-size: 14px; font-weight: 700; margin-top: 5px; }
+
+        .date-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+        .date-txt { color: #ad1457; font-size: 24px; font-weight: 900; white-space: nowrap; }
+        .chk-big { width: 32px; height: 32px; accent-color: #1a237e; border: 3px solid #000; flex-shrink: 0; cursor: pointer; }
+        
+        .info-row { color: #1a237e; font-size: 18px; font-weight: 900; margin-bottom: 8px; display: flex; align-items: flex-start; }
+        .info-label { flex-shrink: 0; width: 4.2em; }
+        .info-content { flex: 1; color: #1a237e; line-height: 1.4; }
+        .dot { color: #000; margin-right: 5px; }
+
+        .table-responsive { width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; border-radius: 15px; border: 3px solid #000; margin-top: 20px; display: block; }
+        .inst-list { width: 100%; border-collapse: collapse; background: #fff; min-width: 500px; }
+        .inst-list th, .inst-list td { border: 1px solid #000; padding: 12px 10px; font-size: 13px; text-align: left; vertical-align: middle; }
+        .inst-list th { background: #1a237e; color: #fff; font-weight: 900; position: sticky; top: 0; }
+        .inst-list td { font-weight: 700; color: #333; }
+
+        .job-link { background: #fff; border: 5px solid #1a237e; border-radius: 25px; padding: 20px; margin-bottom: 15px; text-decoration: none; display: block; }
+        .job-title { color: #1a237e; font-size: 22px; font-weight: 900; text-decoration: underline; }
+
+        .action-btn { width: 100%; padding: 15px; background: #1a237e; color: #fff; border: none; border-radius: 15px; font-weight: 900; font-size: 18px; margin-top: 10px; margin-bottom: 25px; cursor: pointer; }
+        .action-btn:active { background: #ad1457; }
+
+        /* 💡 하단 바 크기 및 텍스트 시인성 대폭 확대 디자인 유지 + z-index 부여로 터치 가로막힘 완벽 방지 */
+        .bottom-nav { 
+            height: 90px; border-top: 2px solid #eee; display: flex; 
+            justify-content: space-around; align-items: center; background: #fff; 
+            padding-bottom: 15px; position: relative; flex-shrink: 0;
+            z-index: 999;
+        }
+        .nav-item { font-size: 14px; font-weight: 700; color: #bbb; text-align: center; flex: 1; cursor: pointer; }
+        .nav-item.active { color: #ad1457; } 
+        .nav-item i { font-size: 28px; display: block; margin-bottom: 6px; }
+        
+        .page { display: none; } .page.active { display: block; }
+    </style>
+    
+    <script>
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('sw.js?v=11')
+                .then(function() { console.log("앱 엔진 가동 완료!"); })
+                .catch(function(err) { console.error("엔진 오류:", err); });
+        }
+    </script>
+</head>
+<body onload="initApp()">
+
+<div class="app-shell">
+    <div class="header">
+        <img src="dobong-logo.png" alt="도봉구 마크" class="logo-img" onerror="this.style.display='none'">
+        <span>도봉 사회복지사 성장 지원</span>
+        <i class="fa-solid fa-gear gear-icon" onclick="nav('admin-login')"></i>
+    </div>
+    
+    <div class="content">
+        <div id="page-home" class="page active">
+            <div class="p-card" style="border-color:#1a237e; padding:15px;">
+                <label style="font-weight:900; color:#1a237e; display:block; margin-bottom:8px;">👤 참여자 본인 이름 입력</label>
+                <input type="text" id="user-name" onchange="saveUserName()" style="width:100%; padding:10px; border:3px solid #000; border-radius:10px; font-weight:700; font-size:16px;" placeholder="성함을 정확히 입력해 주세요">
+            </div>
+            <div class="overall-progress-box">
+                <span class="overall-label">전체 프로그램 이수율</span>
+                <div class="overall-bar"><div id="main-gauge" class="overall-fill"></div></div>
+                <span id="main-status" class="status-text">계산 중...</span>
+            </div>
+            <div class="roadmap-grid">
+                <div class="tile yellow" onclick="nav('participation')"><span class="tile-name">교육</span><span id="edu-hour" class="tile-hour">0 / 18시간</span></div>
+                <div class="tile beige" onclick="nav('trip')"><span class="tile-name">탐방</span><span id="trip-hour" class="tile-hour">0 / 26시간</span></div>
+                <div class="tile pink" onclick="nav('practice')"><span class="tile-name">실습</span><span id="prac-hour" class="tile-hour">0 / 20시간</span></div>
+                <div class="tile purple" onclick="nav('job')"><span class="tile-name small">취업지원</span><span class="tile-hour">상시 운영</span></div>
+            </div>
+            <div class="p-card" style="border-width:3px; padding:15px;">
+                <span style="font-size:18px; font-weight:900;">오늘의 일정</span>
+                <div style="margin-top:10px; display:flex; justify-content:space-between; align-items:center;">
+                    <span id="today-event-text" style="font-weight:700; color:#ad1457;">조회 중...</span>
+                    <i class="fa-solid fa-chevron-right"></i>
+                </div>
+            </div>
+
+            <div style="text-align: center; margin-top: 35px; margin-bottom: 5px; padding: 15px 10px; border-top: 2px dashed #1a237e; color: #333; font-size: 13px; font-weight: 700; background-color: #f9f9f9; border-radius: 12px; line-height: 1.7; word-break: keep-all;">
+                📞 문의처: 도봉구청 복지정책과 (02-2091-3042)
+                <span style="font-size: 11px; color: #666; font-weight: normal; display: block; margin-top: 6px;">
+                    본 프로그램은 참여자 일정관리용으로 제작되었으며<br>
+                    외부 배포를 금합니다.<br>
+                    저작권은 서울특별시 도봉구에 있습니다.
+                </span>
+            </div>
+        </div>
+
+        <div id="page-participation" class="page">
+            <div class="p-card"><div class="date-row"><span class="date-txt">2026. 06. 09 (화)</span><input type="checkbox" id="edu-1" class="chk-big edu-chk" value="3" onchange="updateProgress()"></div><span style="font-weight:900; display:block; margin-bottom:10px;">오리엔테이션과 취업특강</span><div class="info-row"><span class="info-label"><span class="dot">⦁</span>시간:</span><span class="info-content">14:00 ~ 17:00 (3시간)</span></div><div class="info-row"><span class="info-label"><span class="dot">⦁</span>장소:</span><span class="info-content">도봉구청 16층 자운봉홀</span></div></div>
+            <div class="p-card"><div class="date-row"><span class="date-txt">2026. 06. 11 (목)</span><input type="checkbox" id="edu-2" class="chk-big edu-chk" value="1" onchange="updateProgress()"></div><span style="font-weight:900; display:block; margin-bottom:10px;">노인맞춤돌봄서비스사업 이해 및 사회복지사의 역할</span><div class="info-row"><span class="info-label"><span class="dot">⦁</span>시간:</span><span class="info-content">13:30 ~ 14:30 (1시간)</span></div><div class="info-row"><span class="info-label"><span class="dot">⦁</span>장소:</span><span class="info-content">도봉노인종합복지관 강당</span></div></div>
+            <div class="p-card"><div class="date-row"><span class="date-txt">2026. 06. 12 (금)</span><input type="checkbox" id="edu-3" class="chk-big edu-chk" value="2" onchange="updateProgress()"></div><span style="font-weight:900; display:block; margin-bottom:10px;">어르신일자리 이해 및 사회복지사의 역할</span><div class="info-row"><span class="info-label"><span class="dot">⦁</span>시간:</span><span class="info-content">10:00 ~ 12:00 (2시간)</span></div><div class="info-row"><span class="info-label"><span class="dot">⦁</span>장소:</span><span class="info-content">도봉구청 16층 자운봉홀</span></div></div>
+            <div class="p-card"><div class="date-row"><span class="date-txt">2026. 06. 15 (월)</span><input type="checkbox" id="edu-4" class="chk-big edu-chk" value="1" onchange="updateProgress()"></div><span style="font-weight:900; display:block; margin-bottom:10px;">사례관리의 이해</span><div class="info-row"><span class="info-label"><span class="dot">⦁</span>시간:</span><span class="info-content">11:00 ~ 12:00 (1시간)</span></div><div class="info-row"><span class="info-label"><span class="dot">⦁</span>장소:</span><span class="info-content">도봉서원종합사회복지관 대강당</span></div></div>
+            <div class="p-card"><div class="date-row"><span class="date-txt">2026. 06. 16 (화)</span><input type="checkbox" id="edu-5" class="chk-big edu-chk" value="2" onchange="updateProgress()"></div><span style="font-weight:900; display:block; margin-bottom:10px;">장애인에 대한 이해 및 사회복지사의 자세</span><div class="info-row"><span class="info-label"><span class="dot">⦁</span>시간:</span><span class="info-content">14:00 ~ 16:00 (2시간)</span></div><div class="info-row"><span class="info-label"><span class="dot">⦁</span>장소:</span><span class="info-content">도봉구청 16층 자운봉홀</span></div></div>
+            <div class="p-card"><div class="date-row"><span class="date-txt">2026. 06. 18 (목)</span><input type="checkbox" id="edu-6" class="chk-big edu-chk" value="4" onchange="updateProgress()"></div><span style="font-weight:900; display:block; margin-bottom:10px;">AI활용 취업 역량 강화 교육</span><div class="info-row"><span class="info-label"><span class="dot">⦁</span>시간:</span><span class="info-content">14:00 ~ 18:00 (4시간)</span></div><div class="info-row"><span class="info-label"><span class="dot">⦁</span>장소:</span><span class="info-content">도봉구청 16층 자운봉홀</span></div></div>
+            <div class="p-card"><div class="date-row"><span class="date-txt">2026. 06. 19 (금)</span><input type="checkbox" id="edu-7" class="chk-big edu-chk" value="4" onchange="updateProgress()"></div><span style="font-weight:900; display:block; margin-bottom:10px;">AI활용 행정 역량 강화 교육</span><div class="info-row"><span class="info-label"><span class="dot">⦁</span>시간:</span><span class="info-content">14:00 ~ 18:00 (4시간)</span></div><div class="info-row"><span class="info-label"><span class="dot">⦁</span>장소:</span><span class="info-content">도봉구청 16층 자운봉홀</span></div></div>
+            <div class="p-card"><div class="date-row"><span class="date-txt">2026. 06. 24 (수)</span><input type="checkbox" id="edu-8" class="chk-big edu-chk" value="1" onchange="updateProgress()"></div><span style="font-weight:900; display:block; margin-bottom:10px;">마을 복지의 이해</span><div class="info-row"><span class="info-label"><span class="dot">⦁</span>시간:</span><span class="info-content">14:00 ~ 15:00 (1시간)</span></div><div class="info-row"><span class="info-label"><span class="dot">⦁</span>장소:</span><span class="info-content">도봉구청 16층 자운봉홀</span></div></div>
+            <button class="action-btn" onclick="sendToServer('교육')">교육 신청 완료</button>
+        </div>
+
+        <div id="page-trip" class="page">
+            <div class="p-card"><div class="date-row"><span style="font-size:20px; font-weight:900;">도봉노인종합복지관</span><input type="checkbox" id="trip-1" class="chk-big trip-chk" value="2" onchange="updateProgress()"></div><div class="info-row"><span class="info-label"><span class="dot">⦁</span>날짜:</span><span class="info-content">2026. 06. 11 (목)</span></div><div class="info-row"><span class="info-label"><span class="dot">⦁</span>시간:</span><span class="info-content">14:30 ~ 15:30</span></div></div>
+            <div class="p-card"><div class="date-row"><span style="font-size:20px; font-weight:900;">도봉서원종합사회복지관</span><input type="checkbox" id="trip-2" class="chk-big trip-chk" value="2" onchange="updateProgress()"></div><div class="info-row"><span class="info-label"><span class="dot">⦁</span>날짜:</span><span class="info-content">2026. 06. 15 (월)</span></div><div class="info-row"><span class="info-label"><span class="dot">⦁</span>시간:</span><span class="info-content">13:00 ~ 15:00</span></div></div>
+            <div class="p-card"><div class="date-row"><span style="font-size:20px; font-weight:900;">도봉지역자활센터</span><input type="checkbox" id="trip-3" class="chk-big trip-chk" value="2" onchange="updateProgress()"></div><div class="info-row"><span class="info-label"><span class="dot">⦁</span>날짜:</span><span class="info-content">2026. 06. 22 (월)</span></div><div class="info-row"><span class="info-label"><span class="dot">⦁</span>시간:</span><span class="info-content">14:00 ~ 16:00</span></div></div>
+            <div class="p-card"><div class="date-row"><span style="font-size:20px; font-weight:900;">도봉장애인종합복지관</span><input type="checkbox" id="trip-4" class="chk-big trip-chk" value="2" onchange="updateProgress()"></div><div class="info-row"><span class="info-label"><span class="dot">⦁</span>날짜:</span><span class="info-content">2026. 06. 23 (화)</span></div><div class="info-row"><span class="info-label"><span class="dot">⦁</span>시간:</span><span class="info-content">10:00 ~ 12:00</span></div></div>
+            <div class="p-card"><div class="date-row"><span style="font-size:20px; font-weight:900;">도봉발달장애인평생교육센터</span><input type="checkbox" id="trip-5" class="chk-big trip-chk" value="2" onchange="updateProgress()"></div><div class="info-row"><span class="info-label"><span class="dot">⦁</span>날짜:</span><span class="info-content">2026. 06. 23 (화)</span></div><div class="info-row"><span class="info-label"><span class="dot">⦁</span>시간:</span><span class="info-content">14:00 ~ 16:00</span></div></div>
+            <div class="p-card"><div class="date-row"><span style="font-size:20px; font-weight:900;">방아골종합사회복지관</span><input type="checkbox" id="trip-6" class="chk-big trip-chk" value="2" onchange="updateProgress()"></div><div class="info-row"><span class="info-label"><span class="dot">⦁</span>날짜:</span><span class="info-content">2026. 06. 24 (수)</span></div><div class="info-row"><span class="info-label"><span class="dot">⦁</span>시간:</span><span class="info-content">10:00 ~ 12:00</span></div></div>
+            <div class="p-card"><div class="date-row"><span style="font-size:20px; font-weight:900;">쌍문동청소년랜드</span><input type="checkbox" id="trip-7" class="chk-big trip-chk" value="2" onchange="updateProgress()"></div><div class="info-row"><span class="info-label"><span class="dot">⦁</span>날짜:</span><span class="info-content">2026. 06. 25 (목)</span></div><div class="info-row"><span class="info-label"><span class="dot">⦁</span>시간:</span><span class="info-content">14:00 ~ 16:00</span></div></div>
+            <div class="p-card"><div class="date-row"><span style="font-size:20px; font-weight:900;">도봉구청소년상담복지센터</span><input type="checkbox" id="trip-8" class="chk-big trip-chk" value="2" onchange="updateProgress()"></div><div class="info-row"><span class="info-label"><span class="dot">⦁</span>날짜:</span><span class="info-content">2026. 06. 26 (금)</span></div><div class="info-row"><span class="info-label"><span class="dot">⦁</span>시간:</span><span class="info-content">10:00 ~ 12:00</span></div></div>
+            <div class="p-card"><div class="date-row"><span style="font-size:20px; font-weight:900;">창동종합사회복지관</span><input type="checkbox" id="trip-9" class="chk-big trip-chk" value="2" onchange="updateProgress()"></div><div class="info-row"><span class="info-label"><span class="dot">⦁</span>날짜:</span><span class="info-content">2026. 06. 26 (금)</span></div><div class="info-content">14:00 ~ 16:00</div></div>
+            <div class="p-card"><div class="date-row"><span style="font-size:20px; font-weight:900;">도봉구가족센터</span><input type="checkbox" id="trip-10" class="chk-big trip-chk" value="2" onchange="updateProgress()"></div><div class="info-row"><span class="info-label"><span class="dot">⦁</span>날짜:</span><span class="info-content">2026. 07. 06 (월)</span></div><div class="info-row"><span class="info-label"><span class="dot">⦁</span>시간:</span><span class="info-content">14:00 ~ 16:00</span></div></div>
+            <div class="p-card"><div class="date-row"><span style="font-size:20px; font-weight:900;">도봉구치매안심센터</span><input type="checkbox" id="trip-11" class="chk-big trip-chk" value="2" onchange="updateProgress()"></div><div class="info-row"><span class="info-label"><span class="dot">⦁</span>날짜:</span><span class="info-content">2026. 07. 07 (화)</span></div><div class="info-row"><span class="info-label"><span class="dot">⦁</span>시간:</span><span class="info-content">14:30 ~ 16:30</span></div></div>
+            <div class="p-card"><div class="date-row"><span style="font-size:20px; font-weight:900;">도봉여성센터</span><input type="checkbox" id="trip-12" class="chk-big trip-chk" value="2" onchange="updateProgress()"></div><div class="info-row"><span class="info-label"><span class="dot">⦁</span>날짜:</span><span class="info-content">2026. 07. 08 (화)</span></div><div class="info-row"><span class="info-label"><span class="dot">⦁</span>시간:</span><span class="info-content">10:00 ~ 11:30</span></div></div>
+            <div class="p-card"><div class="date-row"><span style="font-size:20px; font-weight:900;">한결사회적협동조합</span><input type="checkbox" id="trip-13" class="chk-big trip-chk" value="2" onchange="updateProgress()"></div><div class="info-row"><span class="info-label"><span class="dot">⦁</span>날짜:</span><span class="info-content">2026. 07. 14 (화)</span></div><div class="info-row"><span class="info-label"><span class="dot">⦁</span>시간:</span><span class="info-content">10:00 ~ 12:00</span></div></div>
+            <button class="action-btn" onclick="sendToServer('탐방')">탐방 신청 완료</button>
+        </div>
+
+        <div id="page-practice" class="page">
+            <span style="font-size:22px; font-weight:900;">실습기관 순위 선택</span>
+            <span style="color:#ad1457; font-weight:900; display:block; margin-bottom:15px;">(20시간 필수)</span>
+            <div style="background:#fff; padding:15px; border:3px solid #000; border-radius:15px; margin-bottom:20px;">
+                <label style="font-weight:900; display:block; margin-bottom:5px;">1순위 희망 기관</label>
+                <select id="select-rank1" onchange="saveTemporaryRank(); updateProgress();" style="width:100%; padding:10px; border:2px solid #1a237e; border-radius:10px; font-weight:700; font-size:15px;">
+                    <option value="">선택해주세요</option>
+                    <option>도봉서원종합사회복지관</option>
+                    <option>도봉발달장애인평생교육센터</option>
+                    <option>도봉시니어클럽</option>
+                    <option>도봉장애인종합복지관</option>
+                    <option>창동어르신복지관</option>
+                    <option>도봉실버센터</option>
+                    <option>도봉구치매안심센터(오전)</option>
+                    <option>도봉구치매안심센터(오후)</option>
+                    <option>한결사회적협동조합</option>
+                    <option>쌍문동청소년랜드</option>
+                </select>
+                <label style="font-weight:900; display:block; margin-top:15px; margin-bottom:5px;">2순위 희망 기관</label>
+                <select id="select-rank2" onchange="saveTemporaryRank();" style="width:100%; padding:10px; border:2px solid #1a237e; border-radius:10px; font-weight:700; font-size:15px;">
+                    <option value="">선택해주세요</option>
+                    <option>도봉서원종합사회복지관</option>
+                    <option>도봉발달장애인평생교육센터</option>
+                    <option>도봉시니어클럽</option>
+                    <option>도봉장애인종합복지관</option>
+                    <option>창동어르신복지관</option>
+                    <option>도봉실버센터</option>
+                    <option>도봉구치매안심센터(오전)</option>
+                    <option>도봉구치매안심센터(오후)</option>
+                    <option>한결사회적협동조합</option>
+                    <option>쌍문동청소년랜드</option>
+                </select>
+                <button class="action-btn" style="margin-bottom:0;" onclick="sendToServer('실습')">실습 신청 완료</button>
+            </div>
+            <div class="table-responsive">
+                <table class="inst-list">
+                    <thead><tr><th>분야</th><th>기관명</th><th>교육날짜</th><th>교육시간</th></tr></thead>
+                    <tbody>
+                        <tr><td>종합사회복지</td><td>도봉서원종합사회복지관</td><td>06.29.(월) ~ 07.03.(금)</td><td>14:00 ~ 18:00</td></tr>
+                        <tr><td>장애인복지</td><td>도봉발달장애인평생교육센터</td><td>06.29.(월) ~ 07.03.(금)</td><td>13:00 ~ 17:00</td></tr>
+                        <tr><td>어르신복지</td><td>도봉시니어클럽</td><td>07.13.(월) ~ 07.20.(월)</td><td>13:00 ~ 17:00</td></tr>
+                        <tr><td>장애인복지</td><td>도봉장애인종합복지관</td><td>07.13.(월) ~ 07.20.(월)</td><td>13:00 ~ 17:00</td></tr>
+                        <tr><td>어르신복지</td><td>창동어르신복지관</td><td>07.20.(월) ~ 07.24.(월)</td><td>09:00 ~ 14:00</td></tr>
+                        <tr><td>어르신복지</td><td>도봉실버센터</td><td>07.20.(월) ~ 07.24.(월)</td><td>13:00 ~ 17:00</td></tr>
+                        <tr><td>보건/의료기타</td><td>도봉구치매안심센터(오전)</td><td>07.20.(월) ~ 07.24.(월)</td><td>09:00 ~ 14:00</td></tr>
+                        <tr><td>보건/의료기타</td><td>도봉구치매안심센터(오후)</td><td>07.20.(월) ~ 07.24.(월)</td><td>13:00 ~ 17:00</td></tr>
+                        <tr><td>사회적협동</td><td>한결사회적협동조합</td><td>07.20.(월) ~ 07.24.(월)</td><td>09:00 ~ 13:00</td></tr>
+                        <tr><td>청소년복지</td><td>쌍문동청소년랜드</td><td>07.21.(화) ~ 07.25.(토)</td><td>13:00 ~ 17:00</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div id="page-job" class="page">
+            <a href="https://www.dobong.go.kr/Contents.asp?code=10008778" target="_blank" class="job-link"><span class="job-title">도봉구청 채용공고</span></a>
+            <a href="https://www.work24.go.kr" target="_blank" class="job-link"><span class="job-title">고용24</span></a>
+            <a href="https://korea-license.net" target="_blank" class="job-link">
+                <span class="job-title">국민자격인증협회</span>
+                <span style="color:#ad1457; font-size:13px; font-weight:900; display:block; margin-top:5px;">(주의:온라인자격증취득사이트 참고용)</span>
+            </a>
+        </div>
+
+        <div id="page-admin-login" class="page">
+            <div style="text-align:center; padding-top:50px;">
+                <h3>관리자 비밀번호 인증</h3>
+                <input type="password" id="admin-pw" style="width:80%; padding:15px; border:4px solid #000; border-radius:15px; text-align:center;" placeholder="비밀번호 입력">
+                <button onclick="checkAdmin()" style="width:80%; padding:15px; background:#1a237e; color:#fff; border-radius:15px; margin-top:15px; font-weight:900;">인증 완료</button>
+            </div>
+        </div>
+
+        <div id="page-admin-dashboard" class="page">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
+                <h3 style="font-weight:900; margin:0; color:#1a237e;">📋 교육생 원격 취합 대시보드</h3>
+                <button onclick="fetchFromServer()" style="padding:8px 12px; background:#1a237e; color:#fff; border:none; border-radius:8px; font-weight:900; font-size:12px;"><i class="fa-solid fa-rotate"></i> 새로고침</button>
+            </div>
+            
+            <div id="lottery-results-box" class="p-card" style="border-color:#ad1457; padding:15px; margin-bottom:20px; display:none;">
+                <span style="font-size:16px; font-weight:900; display:block; margin-bottom:12px; color:#ad1457;"><i class="fa-solid fa-trophy"></i> 🎲 통합 1·2지망 연계 자동 추첨 매칭 결과</span>
+                <div class="table-responsive" style="margin-top:0; border-width:2px; display:block;">
+                    <table style="width:100%; border-collapse: collapse; font-size:12px; text-align:left; min-width:450px;">
+                        <thead>
+                            <tr style="background:#ad1457; color:#fff;">
+                                <th style="padding:10px; border:1px solid #000; font-weight:900; width:30%;">이름</th>
+                                <th style="padding:10px; border:1px solid #000; font-weight:900; width:35%;">최종 배정 결과</th>
+                                <th style="padding:10px; border:1px solid #000; font-weight:900; width:35%;">배정 완료 기관</th>
+                            </tr>
+                        </thead>
+                        <tbody id="lottery-results-body">
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="p-card" style="border-color:#1a237e; padding:15px; margin-bottom:20px;">
+                <span style="font-size:16px; font-weight:900; display:block; margin-bottom:5px; color:#1a237e;"><i class="fa-solid fa-chart-simple"></i> 실습기관별 1순위 지망 통계</span>
+                <button onclick="runIntegratedLottery()" class="action-btn" style="background:#ad1457; margin-top:5px; margin-bottom:15px; font-size:15px;"><i class="fa-solid fa-dice"></i> 1·2순위 결합 연계 자동 추첨 실행하기</button>
+                
+                <div class="table-responsive" style="margin-top:0; border-width:2px; display:block;">
+                    <table style="width:100%; border-collapse: collapse; font-size:12px; text-align:left; min-width:450px;">
+                        <thead>
+                            <tr style="background:#1a237e; color:#fff;">
+                                <th style="padding:10px; border:1px solid #000; font-weight:900; width:60%;">실습 기관명</th>
+                                <th style="padding:10px; border:1px solid #000; font-weight:900; width:40%;">1순위 신청 인원</th>
+                            </tr>
+                        </thead>
+                        <tbody id="admin-summary-body">
+                            <tr><td colspan="2" style="padding:15px; text-align:center; font-weight:700; color:#999;">데이터를 불러오는 중입니다...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="p-card" style="border-width:3px; padding:15px; margin-bottom:20px;">
+                <span style="font-size:16px; font-weight:900; display:block; margin-bottom:12px; color:#000;">✔ 구글 스프레드시트 실시간 취합 현황 원본</span>
+                <div class="table-responsive" style="margin-top:0; border-width:2px; display:block;">
+                    <table style="width:100%; border-collapse: collapse; font-size:12px; text-align:left; min-width:700px; table-layout:fixed;">
+                        <thead>
+                            <tr style="background:#1a237e; color:#fff;">
+                                <th style="padding:10px; border:1px solid #000; font-weight:900; width:16%;">이름</th>
+                                <th style="padding:10px; border:1px solid #000; font-weight:900; width:13%; text-align:center;">관리</th>
+                                <th style="padding:10px; border:1px solid #000; font-weight:900; width:16%;">교육시간</th>
+                                <th style="padding:10px; border:1px solid #000; font-weight:900; width:16%;">탐방시간</th>
+                                <th style="padding:10px; border:1px solid #000; font-weight:900; width:21%;">1순위 희망지</th>
+                                <th style="padding:10px; border:1px solid #000; font-weight:900; width:21%;">2순위 희망지</th>
+                            </tr>
+                        </thead>
+                        <tbody id="admin-table-body">
+                            <tr><td colspan="6" style="padding:20px; text-align:center; font-weight:700; color:#999;">구글 서버 연동 후 확인 가능합니다.</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <button onclick="nav('home')" style="width:100%; padding:14px; background:#000; color:#fff; border:none; border-radius:12px; font-weight:900; font-size:16px;">홈 화면으로 돌아가기</button>
+        </div>
+    </div>
+
+    <div class="bottom-nav">
+        <div class="nav-item active" onclick="nav('home')"><i class="fa-solid fa-house"></i>홈</div>
+        <div class="nav-item" onclick="nav('participation')"><i class="fa-solid fa-calendar-check"></i>교육</div>
+        <div class="nav-item" onclick="nav('trip')"><i class="fa-solid fa-map-location-dot"></i>탐방</div>
+        <div class="nav-item" onclick="nav('practice')"><i class="fa-solid fa-hand-holding-heart"></i>실습</div>
+    </div>
+</div>
+
+<script>
+    var GOOGLE_WEBHOOK_URL = "https://script.google.com/macros/s/AKfycbxIz0QPv_22ujZ4iZJhJiEg7-XAo_1kg13zYWD5bY21VOkWehL7muBsJUxu3u_zXu05Jw/exec";
+    
+    var serverRawData = []; 
+
+    var institutionsList = [
+        "도봉서원종합사회복지관", "도봉발달장애인평생교육센터", "도봉시니어클럽", 
+        "도봉장애인종합복지관", "창동어르신복지관", "도봉실버센터", 
+        "도봉구치매안심센터(오전)", "도봉구치매안심센터(오후)", "한결사회적협동조합", "쌍문동청소년랜드"
+    ];
+
+    var schedules = [
+        { date: "2026-06-09", title: "오늘 일정: 오리엔테이션 (구청 16층 자운봉홀)" },
+        { date: "2026-06-11", title: "오늘 일정: 실무 이론교육 4 및 기관 탐방" },
+        { date: "2026-06-12", title: "오늘 일정: 실무 이론교육 1" },
+        { date: "2026-06-15", title: "오늘 일정: 실무 이론교육 2 및 기관 탐방" },
+        { date: "2026-06-16", title: "오늘 일정: 실무 이론교육 3" },
+        { date: "2026-06-18", title: "오늘 일정: 취업 역량 강화 교육" },
+        { date: "2026-06-19", title: "오늘 일정: 행정 역량 강화 교육" },
+        { date: "2026-06-24", title: "오늘 일정: 실무 이론교육 5 및 기관 탐방" }
+    ];
+
+    function initApp() {
+        try {
+            var savedName = localStorage.getItem('dobong_user_name');
+            if (savedName) { document.getElementById('user-name').value = savedName; }
+            var eduChks = document.querySelectorAll('.edu-chk');
+            for (var i = 0; i < eduChks.length; i++) { if (localStorage.getItem('dobong_edu_' + eduChks[i].id) === 'true') { eduChks[i].checked = true; } }
+            var tripChks = document.querySelectorAll('.trip-chk');
+            for (var j = 0; j < tripChks.length; j++) { if (localStorage.getItem('dobong_trip_' + tripChks[j].id) === 'true') { tripChks[j].checked = true; } }
+            var r1 = localStorage.getItem('dobong_app_rank1');
+            var r2 = localStorage.getItem('dobong_app_rank2');
+            if (r1) document.getElementById('select-rank1').value = r1;
+            if (r2) document.getElementById('select-rank2').value = r2;
+            setTodaySchedule();
+            updateProgress();
+        } catch (e) { console.error(e); }
+    }
+
+    function saveUserName() {
+        var name = document.getElementById('user-name').value.trim();
+        localStorage.setItem('dobong_user_name', name);
+    }
+
+    function setTodaySchedule() {
+        var todayStr = new Date().toISOString().split('T')[0];
+        var event = schedules.find(function(s) { return s.date === todayStr; });
+        if (event) {
+            document.getElementById('today-event-text').innerText = event.title;
+        } else {
+            var futureEvents = schedules.filter(function(s) { return s.date >= todayStr; }).sort(function(a, b) { return a.date.localeCompare(b.date); });
+            if (futureEvents.length > 0) { document.getElementById('today-event-text').innerText = "[예정] " + futureEvents[0].title.replace("오늘 일정: ", ""); } 
+            else { document.getElementById('today-event-text').innerText = "현재 진행 중인 예정 일정이 없습니다."; }
+        }
+    }
+
+    function nav(pageId) {
+        document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+        document.getElementById('page-' + pageId).classList.add('active');
+        document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
+        if(pageId === 'home') document.querySelectorAll('.nav-item')[0].classList.add('active');
+        if(pageId === 'participation') document.querySelectorAll('.nav-item')[1].classList.add('active');
+        if(pageId === 'trip') document.querySelectorAll('.nav-item')[2].classList.add('active');
+        if(pageId === 'practice') document.querySelectorAll('.nav-item')[3].classList.add('active');
+    }
+
+    function updateProgress() {
+        var edu = 0; var eduChks = document.querySelectorAll('.edu-chk');
+        for (var i = 0; i < eduChks.length; i++) {
+            if (eduChks[i].checked) { edu += parseInt(eduChks[i].value) || 0; }
+            localStorage.setItem('dobong_edu_' + eduChks[i].id, eduChks[i].checked);
+        }
+        document.getElementById('edu-hour').innerText = edu + " / 18시간";
+        
+        var trip = 0; var tripChks = document.querySelectorAll('.trip-chk');
+        for (var j = 0; j < tripChks.length; j++) {
+            if (tripChks[j].checked) { trip += parseInt(tripChks[j].value) || 0; }
+            localStorage.setItem('dobong_trip_' + tripChks[j].id, tripChks[j].checked);
+        }
+        document.getElementById('trip-hour').innerText = trip + " / 26시간";
+        
+        var prac = 0; var rank1Value = document.getElementById('select-rank1').value;
+        if (rank1Value !== "") { prac = 20; }
+        document.getElementById('prac-hour').innerText = prac + " / 20시간";
+        
+        /* 💡 [버그 교정] 무한 대입 루프 및 연산 랙을 유발하던 이중 total 변수 오타를 깔끔하게 단일 변수 구조로 연산 리팩토링 */
+        var total = edu + trip + prac; 
+        var percent = Math.round((total / 58) * 100); 
+        if(percent > 100) percent = 100;
+        if(isNaN(percent)) percent = 0;
+        
+        document.getElementById('main-gauge').style.width = percent + "%";
+        document.getElementById('main-status').innerText = percent + "% 완료 (" + total + " / 58시간 완료)";
+    }
+
+    function saveTemporaryRank() {
+        var r1 = document.getElementById('select-rank1').value;
+        var r2 = document.getElementById('select-rank2').value;
+        localStorage.setItem('dobong_app_rank1', r1);
+        localStorage.setItem('dobong_app_rank2', r2);
+    }
+
+    function sendToServer(type) {
+        var name = document.getElementById('user-name').value.trim();
+        if (!name) { alert("홈 화면에서 '참여자 본인 이름'을 먼저 입력해 주세요!"); nav('home'); return; }
+
+        updateProgress();
+        var eduTime = document.getElementById('edu-hour').innerText;
+        var tripTime = document.getElementById('trip-hour').innerText;
+        var r1 = document.getElementById('select-rank1').value || "미선택";
+        var r2 = document.getElementById('select-rank2').value || "미선택";
+        var payload = { name: name, type: type, edu: eduTime, trip: tripTime, rank1: r1, rank2: r2 };
+
+        fetch(GOOGLE_WEBHOOK_URL, {
+            method: "POST",
+            mode: "no-cors",
+            headers: { "Content-Type": "text/plain" },
+            body: JSON.stringify(payload)
+        }).then(function() {
+            alert("[" + type + "] 현황이 실시간 전송 완료되었습니다! ✅");
+        }).catch(function(err) {
+            alert("전송 실패 (네트워크 연결을 확인해 주세요)");
+        });
+    }
+
+    function fetchFromServer() {
+        var tbody = document.getElementById('admin-table-body');
+        tbody.innerHTML = '<tr><td colspan="6" style="padding:20px; text-align:center; font-weight:900; color:#1a237e;"><i class="fa-solid fa-spinner fa-spin"></i> 구글 서버에서 실시간 데이터 로드 중...</td></tr>';
+        document.getElementById('admin-summary-body').innerHTML = '<tr><td colspan="2" style="padding:10px; text-align:center;">집계 중...</td></tr>';
+
+        var oldScript = document.getElementById('jsonp-script');
+        if (oldScript) { oldScript.remove(); }
+
+        var script = document.createElement('script');
+        script.id = 'jsonp-script';
+        script.src = GOOGLE_WEBHOOK_URL + "?callback=renderAdminTable";
+        
+        script.onerror = function() {
+            tbody.innerHTML = '<tr><td colspan="6" style="padding:20px; text-align:center; font-weight:700; color:red;">서버 연결 실패. 배포 설정(Anyone)을 확인해 주세요.</td></tr>';
+        };
+
+        document.body.appendChild(script);
+    }
+
+    function renderAdminTable(data) {
+        serverRawData = data; 
+        var tbody = document.getElementById('admin-table-body');
+        if (!data || data.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="6" style="padding:20px; text-align:center; font-weight:700; color:#999;">제출된 데이터가 없습니다.</td></tr>';
+            renderSummaryTable([]);
+            return;
+        }
+        var html = "";
+        for (var i = 0; i < data.length; i++) {
+            html += "<tr>" +
+                    "<td style='padding:12px 10px; border:1px solid #000; font-weight:900;'>" + data[i].name + "</td>" +
+                    "<td style='padding:8px 5px; border:1px solid #000; text-align:center;'>" +
+                    "<button onclick=\"deleteTrainee('" + data[i].name + "')\" style='padding:6px 10px; background:#d32f2f; color:#fff; border:none; border-radius:8px; font-weight:900; cursor:pointer; font-size:12px;'>삭제</button>" +
+                    "</td>" +
+                    "<td style='padding:12px 10px; border:1px solid #000; font-weight:700; color:#1a237e;'>" + data[i].edu + "</td>" +
+                    "<td style='padding:12px 10px; border:1px solid #000; font-weight:700; color:#ad1457;'>" + data[i].trip + "</td>" +
+                    "<td style='padding:12px 10px; border:1px solid #000; font-weight:700; word-break:break-all;'>" + data[i].rank1 + "</td>" +
+                    "<td style='padding:12px 10px; border:1px solid #000; font-weight:700; color:#666; word-break:break-all;'>" + data[i].rank2 + "</td>" +
+                    "</tr>";
+        }
+        tbody.innerHTML = html;
+        renderSummaryTable(data);
+    }
+
+    function renderSummaryTable(data) {
+        var summaryBody = document.getElementById('admin-summary-body');
+        var html = "";
+        for (var i = 0; i < institutionsList.length; i++) {
+            var instName = institutionsList[i];
+            var count = data.filter(function(d) { return d.rank1 === instName; }).length;
+            var textStyle = count > 4 ? "color:#d32f2f; font-weight:900;" : "color:#333; font-weight:700;";
+            html += "<tr>" +
+                    "<td style='padding:10px; border:1px solid #000; font-weight:900;'>" + instName + "</td>" +
+                    "<td style='padding:10px; border:1px solid #000;" + textStyle + "'>" + count + " 명</td>" +
+                    "</tr>";
+        }
+        summaryBody.innerHTML = html;
+    }
+
+    function runIntegratedLottery() {
+        if (!serverRawData || serverRawData.length === 0) {
+            alert("추첨 가동을 위한 데이터가 없습니다. [새로고침]을 먼저 해주세요.");
+            return;
+        }
+        if (!confirm("지망 결합형 연계 통합 자동 추첨을 시작하시겠습니까?")) return;
+
+        var capacities = {};
+        for (var i = 0; i < institutionsList.length; i++) { capacities[institutionsList[i]] = 4; }
+        var finalStatus = {}; var firstChoiceDropouts = []; 
+
+        for (var i = 0; i < institutionsList.length; i++) {
+            var inst = institutionsList[i];
+            var applicants = serverRawData.filter(function(d) { return d.rank1 === inst; });
+            if (applicants.length <= 4) {
+                for (var j = 0; j < applicants.length; j++) {
+                    finalStatus[applicants[j].name] = { status: "🎯 확정 (1순위)", inst: inst, type: "success" };
+                    capacities[inst]--;
+                }
+            } else {
+                var names = applicants.map(function(d) { return d.name; });
+                for (var k = names.length - 1; k > 0; k--) {
+                    var r = Math.floor(Math.random() * (k + 1));
+                    var temp = names[k]; names[k] = names[r]; names[r] = temp;
+                }
+                for (var j = 0; j < 4; j++) {
+                    finalStatus[names[j]] = { status: "🎯 확정 (1순위)", inst: inst, type: "success" };
+                    capacities[inst]--;
+                }
+                for (var j = 4; j < names.length; j++) { firstChoiceDropouts.push(names[j]); }
+            }
+        }
+
+        for (var i = 0; i < serverRawData.length; i++) {
+            var p = serverRawData[i];
+            if (!p.rank1 || p.rank1 === "미선택" || p.rank1 === "") { firstChoiceDropouts.push(p.name); }
+        }
+        firstChoiceDropouts = Array.from(new Set(firstChoiceDropouts)); 
+
+        for (var i = 0; i < institutionsList.length; i++) {
+            var inst = institutionsList[i];
+            var remCap = capacities[inst]; 
+            var fallbackApplicants = [];
+            for (var j = 0; j < firstChoiceDropouts.length; j++) {
+                var pName = firstChoiceDropouts[j];
+                var pData = serverRawData.find(function(d) { return d.name === pName; });
+                if (pData && pData.rank2 === inst) { fallbackApplicants.push(pName); }
+            }
+            if (fallbackApplicants.length > 0) {
+                if (fallbackApplicants.length <= remCap) {
+                    for (var j = 0; j < fallbackApplicants.length; j++) {
+                        finalStatus[fallbackApplicants[j]] = { status: "✅ 확정 (2순위)", inst: inst, type: "warning" };
+                        capacities[inst]--;
+                    }
+                } else {
+                    for (var k = fallbackApplicants.length - 1; k > 0; k--) {
+                        var r = Math.floor(Math.random() * (k + 1));
+                        var temp = fallbackApplicants[k]; fallbackApplicants[k] = fallbackApplicants[r]; fallbackApplicants[r] = temp;
+                    }
+                    for (var j = 0; j < remCap; j++) {
+                        finalStatus[fallbackApplicants[j]] = { status: "✅ 확정 (2순위)", inst: inst, type: "warning" };
+                        capacities[inst]--;
+                    }
+                }
+            }
+        }
+
+        for (var i = 0; i < serverRawData.length; i++) {
+            var name = serverRawData[i].name;
+            if (!finalStatus[name]) {
+                finalStatus[name] = { status: "🚨 재신청 필요", inst: "<span style='color:#d32f2f; font-weight:900;'>1·2지망 모두 낙첨</span>", type: "danger" };
+            }
+        }
+
+        var resultBox = document.getElementById('lottery-results-box');
+        var resultBody = document.getElementById('lottery-results-body');
+        resultBox.style.display = "block";
+        var html = "";
+        for (var name in finalStatus) {
+            var res = finalStatus[name];
+            var textStyle = "";
+            if (res.type === "success") textStyle = "color:#1a237e; font-weight:900;";
+            if (res.type === "warning") textStyle = "color:#e65100; font-weight:900;";
+            if (res.type === "danger") textStyle = "color:#d32f2f; font-weight:900;";
+            html += "<tr style='" + (res.type === 'danger' ? 'background:#ffebee;' : '') + "'>" +
+                    "<td style='padding:12px 10px; border:1px solid #000; font-weight:900;'>" + name + "</td>" +
+                    "<td style='padding:12px 10px; border:1px solid #000;" + textStyle + "'>" + res.status + "</td>" +
+                    "<td style='padding:12px 10px; border:1px solid #000; font-weight:700;'>" + res.inst + "</td>" +
+                    "</tr>";
+        }
+        resultBody.innerHTML = html;
+        document.querySelector('.content').scrollTop = 0;
+        alert("통합 추첨이 완료되었습니다!");
+    }
+
+    function deleteTrainee(name) {
+        if (!confirm("[" + name + "] 데이터를 삭제하시겠습니까?")) return;
+        fetch(GOOGLE_WEBHOOK_URL, {
+            method: "POST",
+            mode: "no-cors",
+            headers: { "Content-Type": "text/plain" },
+            body: JSON.stringify({ name: name, type: "삭제" })
+        }).then(function() {
+            alert("삭제 완료! ✅");
+            fetchFromServer();
+        }).catch(function() { alert("삭제 실패"); });
+    }
+
+    function checkAdmin() {
+        if(document.getElementById('admin-pw').value === '3042') {
+            nav('admin-dashboard'); fetchFromServer();
+        } else { alert('비밀번호 오류'); }
+    }
+</script>
+</body>
+</html>
