@@ -7,12 +7,13 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="도봉사회복지성장">
     
-    <link rel="shortcut icon" type="image/png" href="icon-512.png">
-    <link rel="icon" type="image/png" sizes="16x16" href="icon-512.png">
-    <link rel="icon" type="image/png" sizes="32x32" href="icon-512.png">
-    <link rel="icon" type="image/png" sizes="192x192" href="icon-512.png">
-    <link rel="apple-touch-icon" sizes="512x512" href="icon-512.png">
-    <link rel="manifest" href="manifest.json">
+    <!-- 💡 icon-512.jpg 파일을 기기 홈 화면 아이콘으로 강제 인식시키는 jpeg 전용 절대 규격 세팅 -->
+    <link rel="shortcut icon" type="image/jpeg" href="icon-512.jpg?v=5">
+    <link rel="icon" type="image/jpeg" sizes="16x16" href="icon-512.jpg?v=5">
+    <link rel="icon" type="image/jpeg" sizes="32x32" href="icon-512.jpg?v=5">
+    <link rel="icon" type="image/jpeg" sizes="192x192" href="icon-512.jpg?v=5">
+    <link rel="apple-touch-icon" sizes="512x512" href="icon-512.jpg?v=5">
+    <link rel="manifest" href="manifest.json?v=5">
     
     <title>도봉 사회복지사 성장 지원</title>
     
@@ -86,7 +87,7 @@
     
     <script>
         if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register('sw.js')
+            navigator.serviceWorker.register('sw.js?v=5')
                 .then(function() { console.log("앱 엔진 가동 완료!"); })
                 .catch(function(err) { console.error("엔진 오류:", err); });
         }
@@ -384,7 +385,7 @@
         if (rank1Value !== "") { prac = 20; }
         document.getElementById('prac-hour').innerText = prac + " / 20시간";
         
-        var total = edu + trip + prac; 
+        var total = total = edu + trip + prac; 
         var percent = Math.round((total / 58) * 100); 
         if(percent > 100) percent = 100;
         if(isNaN(percent)) percent = 0;
